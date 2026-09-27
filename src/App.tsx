@@ -49,8 +49,20 @@ import {
 } from 'lucide-react';
 
 export function App() {
-  // State from storage
-  const [role, setRole] = useState<UserRole>('teacher');
+  // Auto-detect role: If opened inside LINE app or URL param specifies ?role=student, default to student view!
+  const [role, setRole] = useState<UserRole>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const paramRole = params.get('role') || params.get('mode');
+      if (paramRole === 'student') return 'student';
+      if (paramRole === 'teacher') return 'teacher';
+      // If opened inside LINE In-App Browser, default to student!
+      if (/Line/i.test(navigator.userAgent)) {
+        return 'student';
+      }
+    }
+    return 'teacher';
+  });
   const [mascot, setMascot] = useState<MascotType>(() => storageService.getMascot());
   const [classrooms, setClassrooms] = useState<Classroom[]>(() => storageService.getClassrooms());
   const [selectedClass, setSelectedClass] = useState(() => classrooms[0]?.name || 'ม.4/1');
