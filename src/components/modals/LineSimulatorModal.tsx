@@ -26,8 +26,8 @@ export const LineSimulatorModal: React.FC<LineSimulatorModalProps> = ({
 
   if (!isOpen) return null;
 
-  const mascotEmoji = mascot === 'chicken' ? '🐔' : '🐷';
-  const mascotName = mascot === 'chicken' ? 'คุณไก่ทวง V.2' : 'คุณหมูทวง V.2';
+  const mascotEmoji = '🐷';
+  const mascotName = 'คุณหมูทวง V.2';
 
   const selectedStudent = students.find((s) => s.id === selectedStudentId);
 

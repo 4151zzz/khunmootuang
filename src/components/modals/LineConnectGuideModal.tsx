@@ -68,8 +68,8 @@ export const LineConnectGuideModal: React.FC<LineConnectGuideModalProps> = ({
     }, 2500);
   };
 
-  const mascotEmoji = mascot === 'chicken' ? '🐔' : '🐷';
-  const mascotName = mascot === 'chicken' ? 'คุณไก่ทวง' : 'คุณหมูทวง';
+  const mascotEmoji = '🐷';
+  const mascotName = 'คุณหมูทวง';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/80 backdrop-blur-sm animate-fadeIn">

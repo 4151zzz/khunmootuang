@@ -109,7 +109,7 @@ export const EggHatchModal: React.FC<EggHatchModalProps> = ({
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold border border-amber-400/30 mb-3">
               <Sparkles className="w-3.5 h-3.5" />
-              {mascot === 'chicken' ? 'ไข่สุ่มนำโชคคุณไก่' : 'ไข่สุ่มนำโชคคุณหมู'}
+              ไข่สุ่มนำโชคคุณหมู
             </div>
 
             <h3 className="text-xl sm:text-2xl font-black tracking-wide text-white">

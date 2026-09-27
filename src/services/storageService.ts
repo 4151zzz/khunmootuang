@@ -14,17 +14,30 @@ const STORAGE_KEYS = {
   MASCOT: 'khunmoo_mascot_theme',
 };
 
+// Automatic cleanup of old mock data from browser localStorage
+if (typeof window !== 'undefined') {
+  const CLEAN_FLAG = 'khunmoo_mock_cleaned_final_v5';
+  if (!localStorage.getItem(CLEAN_FLAG)) {
+    localStorage.removeItem(STORAGE_KEYS.STUDENTS);
+    localStorage.removeItem(STORAGE_KEYS.ASSIGNMENTS);
+    localStorage.removeItem(STORAGE_KEYS.SUBMISSIONS);
+    localStorage.removeItem(STORAGE_KEYS.ATTENDANCE);
+    localStorage.removeItem(STORAGE_KEYS.WORD_CLOUD);
+    localStorage.removeItem(STORAGE_KEYS.POLL);
+    localStorage.removeItem('khunmoo_bound_student_id');
+    localStorage.setItem(CLEAN_FLAG, 'true');
+  }
+}
+
 export const INITIAL_CLASSROOMS: Classroom[] = [
-  { id: 'cls-1', name: 'ม.4/1', gradeLevel: 'ม.4', academicYear: '2569', description: 'ห้องเรียนวิทย์-คอมพิวเตอร์ (12 คน)' },
-  { id: 'cls-2', name: 'ม.4/2', gradeLevel: 'ม.4', academicYear: '2569', description: 'ห้องเรียนวิทย์-คณิต' },
-  { id: 'cls-3', name: 'ม.5/3', gradeLevel: 'ม.5', academicYear: '2569', description: 'ห้องเรียนศิลป์-คำนวณ' },
+  { id: 'cls-1', name: 'ม.4/1', gradeLevel: 'ม.4', academicYear: '2569', description: 'ห้องเรียนเริ่มต้น' },
 ];
 
 export const defaultSettings: LineSettings = {
-  channelAccessToken: 'mock_line_channel_access_token_1234567890abcdef',
-  channelSecret: 'mock_channel_secret_987654',
-  liffId: '2001234567-AbCdEfGh',
-  webhookUrl: 'https://api.khunmootuang.app/webhook/line',
+  channelAccessToken: '',
+  channelSecret: '',
+  liffId: '',
+  webhookUrl: '',
   geminiApiKey: '',
 };
 
@@ -49,13 +62,13 @@ export const storageService = {
   getStudents(): Student[] {
     const raw = localStorage.getItem(STORAGE_KEYS.STUDENTS);
     if (!raw) {
-      localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(INITIAL_STUDENTS));
-      return INITIAL_STUDENTS;
+      localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify([]));
+      return [];
     }
     try {
       return JSON.parse(raw);
     } catch {
-      return INITIAL_STUDENTS;
+      return [];
     }
   },
 
@@ -183,12 +196,11 @@ export const storageService = {
   },
 
   getMascot(): MascotType {
-    const raw = localStorage.getItem(STORAGE_KEYS.MASCOT);
-    return (raw === 'chicken' ? 'chicken' : 'pig') as MascotType;
+    return 'pig';
   },
 
-  saveMascot(mascot: MascotType) {
-    localStorage.setItem(STORAGE_KEYS.MASCOT, mascot);
+  saveMascot(_mascot: MascotType) {
+    localStorage.setItem(STORAGE_KEYS.MASCOT, 'pig');
   },
 
   resetAll() {

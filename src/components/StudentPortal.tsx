@@ -42,8 +42,8 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
   const [activeTab, setActiveTab] = useState<'assignments' | 'pets' | 'profile'>('assignments');
   const [selectedAsgForUpload, setSelectedAsgForUpload] = useState<string | null>(null);
 
-  const mascotEmoji = mascot === 'chicken' ? '🐔' : '🐷';
-  const mascotName = mascot === 'chicken' ? 'คุณไก่ทวง' : 'คุณหมูทวง';
+  const mascotEmoji = '🐷';
+  const mascotName = 'คุณหมูทวง';
 
   const sampleWorkImages = [
     'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80',
@@ -192,18 +192,27 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
       {/* Tab 1: Assignments list */}
       {activeTab === 'assignments' && (
         <div className="p-4 space-y-3 flex-1 overflow-y-auto">
-          {assignments.map((asg) => {
-            const sub = submissions.find(
-              (s) => s.assignmentId === asg.id && s.studentId === currentStudent.id
-            );
-            const isSubmitted = sub && sub.status !== 'pending';
-            const isGraded = sub?.status === 'graded';
+          {assignments.length === 0 ? (
+            <div className="text-center py-12 bg-white rounded-3xl border border-dashed border-slate-200 p-6 shadow-sm">
+              <div className="text-4xl mb-3">🎉</div>
+              <h4 className="font-bold text-sm text-slate-800">ยังไม่มีการบ้านในขณะนี้</h4>
+              <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
+                คุณครูยังไม่ได้มอบหมายงานใหม่ เมื่อมีการบ้านใหม่ ระบบจะแจ้งเตือนผ่าน LINE ทันทีครับ
+              </p>
+            </div>
+          ) : (
+            assignments.map((asg) => {
+              const sub = submissions.find(
+                (s) => s.assignmentId === asg.id && s.studentId === currentStudent.id
+              );
+              const isSubmitted = sub && sub.status !== 'pending';
+              const isGraded = sub?.status === 'graded';
 
-            return (
-              <div
-                key={asg.id}
-                className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3"
-              >
+              return (
+                <div
+                  key={asg.id}
+                  className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 space-y-3"
+                >
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <span className="text-[10px] font-bold bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
@@ -289,7 +298,7 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
                 </div>
               </div>
             );
-          })}
+          }))}
         </div>
       )}
 

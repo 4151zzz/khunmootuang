@@ -11,7 +11,6 @@ interface StudentOnboardingProps {
   mascot: MascotType;
   lineProfile: LineUserProfile | null;
   onComplete: (studentId: string, updatedStudents?: Student[]) => void;
-  onSwitchToTeacher?: () => void;
 }
 
 export const StudentOnboarding: React.FC<StudentOnboardingProps> = ({
@@ -20,7 +19,6 @@ export const StudentOnboarding: React.FC<StudentOnboardingProps> = ({
   mascot,
   lineProfile,
   onComplete,
-  onSwitchToTeacher
 }) => {
   const [selectedClass, setSelectedClass] = useState<string>(classrooms[0]?.name || 'ม.4/1');
   const [selectedStudentId, setSelectedStudentId] = useState<string>('');
@@ -31,8 +29,8 @@ export const StudentOnboarding: React.FC<StudentOnboardingProps> = ({
   const [newNickname, setNewNickname] = useState('');
   const [newStudentNumber, setNewStudentNumber] = useState<number>(1);
 
-  const mascotEmoji = mascot === 'pig' ? '🐷' : '🐔';
-  const mascotName = mascot === 'pig' ? 'คุณหมูทวง' : 'คุณไก่ทวง';
+  const mascotEmoji = '🐷';
+  const mascotName = 'คุณหมูทวง';
 
   // Filter students by selected classroom
   const classStudents = students.filter((s) => s.classroom === selectedClass);
@@ -331,19 +329,6 @@ export const StudentOnboarding: React.FC<StudentOnboardingProps> = ({
             <span>เข้าสู่ห้องเรียน & เริ่มต้นส่งการบ้าน</span>
             <ArrowRight className="w-4 h-4" />
           </button>
-
-          {/* Teacher switch link for fallback */}
-          {onSwitchToTeacher && (
-            <div className="text-center pt-2">
-              <button
-                type="button"
-                onClick={onSwitchToTeacher}
-                className="text-[11px] text-slate-400 hover:text-slate-600 hover:underline"
-              >
-                คุณเป็นครูผู้สอน? สลับไปหน้าควบคุมของคุณครู
-              </button>
-            </div>
-          )}
 
         </div>
       </div>

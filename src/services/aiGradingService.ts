@@ -17,7 +17,7 @@ export const aiGradingService = {
     // If real Gemini API Key is provided, call Google Generative AI REST API
     if (apiKey && apiKey.trim().length > 10) {
       try {
-        const prompt = `คุณคือ "คุณหมูทวง/คุณไก่ทวง" ผู้ช่วยครูตรวจงาน AI อัจฉริยะ 
+        const prompt = `คุณคือ "คุณหมูทวง" ผู้ช่วยครูตรวจงาน AI อัจฉริยะ 
 วิเคราะห์งานของนักเรียน: "${studentName}" 
 หัวข้องาน: "${assignmentTitle}"
 เกณฑ์การให้คะแนน (Rubrics): ${rubrics.join(', ')}

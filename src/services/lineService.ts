@@ -12,10 +12,10 @@ export interface LinePushMessagePayload {
 
 export const lineService = {
   // Generate authentic LINE Flex Message bubble for Homework Reminder (ทวงงาน)
-  createAssignmentFlexBubble(assignment: Assignment, targetStudentName?: string, mascot: 'pig' | 'chicken' = 'pig') {
-    const mascotEmoji = mascot === 'chicken' ? '🐔' : '🐷';
-    const mascotName = mascot === 'chicken' ? 'คุณไก่ทวง V.2' : 'คุณหมูทวง V.2';
-    const headerColor = mascot === 'chicken' ? '#ea580c' : '#e11d48';
+  createAssignmentFlexBubble(assignment: Assignment, targetStudentName?: string) {
+    const mascotEmoji = '🐷';
+    const mascotName = 'คุณหมูทวง V.2';
+    const headerColor = '#e11d48';
 
     return {
       type: 'bubble',

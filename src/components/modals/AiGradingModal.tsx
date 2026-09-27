@@ -73,8 +73,8 @@ export const AiGradingModal: React.FC<AiGradingModalProps> = ({
     onClose();
   };
 
-  const mascotEmoji = mascot === 'chicken' ? '🐔' : '🐷';
-  const mascotTitle = mascot === 'chicken' ? 'คุณไก่ช่วยตรวจ AI' : 'คุณหมูช่วยตรวจ AI';
+  const mascotEmoji = '🐷';
+  const mascotTitle = 'คุณหมูช่วยตรวจ AI';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-900/70 backdrop-blur-sm animate-fadeIn">

@@ -19,9 +19,8 @@ export const MascotBanner: React.FC<MascotBannerProps> = ({
   onStepClick,
   onQuickRemind,
 }) => {
-  const isPig = mascot === 'pig';
-  const mascotEmoji = isPig ? '🐷' : '🐔';
-  const mascotName = isPig ? 'คุณหมูทวง' : 'คุณไก่ทวง';
+  const mascotEmoji = '🐷';
+  const mascotName = 'คุณหมูทวง';
 
   const steps = [
     { num: 1, label: 'มอบหมาย', icon: Send, desc: 'สร้างงาน & กำหนดวันส่ง' },
@@ -67,9 +66,17 @@ export const MascotBanner: React.FC<MascotBannerProps> = ({
           <div className="bg-white/95 text-slate-800 rounded-2xl p-4 shadow-xl border-2 border-emerald-400/40 max-w-sm relative">
             <div className="absolute -left-2 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rotate-45 border-l-2 border-b-2 border-emerald-400/40 hidden md:block"></div>
             <p className="text-xs sm:text-sm font-medium leading-relaxed">
-              &ldquo;สวัสดีครับคุณครู! ตอนนี้มีนักเรียนยังไม่ส่งงาน{' '}
-              <span className="text-rose-600 font-extrabold">{pendingCount}</span> จาก {totalStudents} คน
-              ให้{mascotName}ยิง LINE ทวงรายคน หรือยิงเข้ากลุ่มให้ไหมครับ? 💬&rdquo;
+              {totalStudents === 0 ? (
+                <>
+                  &ldquo;สวัสดีครับคุณครู! ยินดีต้อนรับสู่{mascotName} V.2 เริ่มต้นเพิ่มรายชื่อนักเรียน หรือสร้างการบ้านแรกเพื่อเริ่มใช้งานได้เลยครับ! 🐷✨&rdquo;
+                </>
+              ) : (
+                <>
+                  &ldquo;สวัสดีครับคุณครู! ตอนนี้มีนักเรียนยังไม่ส่งงาน{' '}
+                  <span className="text-rose-600 font-extrabold">{pendingCount}</span> จาก {totalStudents} คน
+                  ให้{mascotName}ยิง LINE ทวงรายคน หรือยิงเข้ากลุ่มให้ไหมครับ? 💬&rdquo;
+                </>
+              )}
             </p>
             <div className="mt-2.5 flex items-center justify-end gap-2">
               <button

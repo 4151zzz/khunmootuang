@@ -65,7 +65,7 @@ export function App() {
     }
     return 'teacher';
   });
-  const [mascot, setMascot] = useState<MascotType>(() => storageService.getMascot());
+  const mascot: MascotType = 'pig';
   const [classrooms, setClassrooms] = useState<Classroom[]>(() => storageService.getClassrooms());
   const [selectedClass, setSelectedClass] = useState(() => classrooms[0]?.name || 'ม.4/1');
   const [activeStep, setActiveStep] = useState(2); // default 2: ทวงงาน
@@ -338,20 +338,20 @@ export function App() {
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 selection:bg-pink-200 selection:text-pink-900">
       
-      {/* Top Navbar */}
-      <Navbar
-        role={role}
-        setRole={setRole}
-        mascot={mascot}
-        setMascot={setMascot}
-        selectedClass={selectedClass}
-        setSelectedClass={setSelectedClass}
-        classrooms={classrooms}
-        onOpenManageClass={() => setShowManageClassModal(true)}
-        onOpenLineGuide={() => setShowLineGuideModal(true)}
-        onOpenSettings={() => setShowSettingsModal(true)}
-        onOpenLineModal={() => setShowLineModal(true)}
-      />
+      {/* Top Navbar: ONLY rendered for Teacher Dashboard */}
+      {role === 'teacher' && (
+        <Navbar
+          role={role}
+          setRole={setRole}
+          selectedClass={selectedClass}
+          setSelectedClass={setSelectedClass}
+          classrooms={classrooms}
+          onOpenManageClass={() => setShowManageClassModal(true)}
+          onOpenLineGuide={() => setShowLineGuideModal(true)}
+          onOpenSettings={() => setShowSettingsModal(true)}
+          onOpenLineModal={() => setShowLineModal(true)}
+        />
+      )}
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
@@ -499,7 +499,6 @@ export function App() {
                   localStorage.setItem('khunmoo_bound_student_id', studentId);
                   setIsSwitchingStudent(false);
                 }}
-                onSwitchToTeacher={() => setRole('teacher')}
               />
             ) : (
               <div className="space-y-4">

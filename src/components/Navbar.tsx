@@ -5,8 +5,6 @@ import { Sparkles, Settings, Smartphone, Monitor, BookOpen, Users } from 'lucide
 interface NavbarProps {
   role: UserRole;
   setRole: (role: UserRole) => void;
-  mascot: MascotType;
-  setMascot: (mascot: MascotType) => void;
   selectedClass: string;
   setSelectedClass: (cls: string) => void;
   classrooms: Classroom[];
@@ -19,8 +17,6 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({
   role,
   setRole,
-  mascot,
-  setMascot,
   selectedClass,
   setSelectedClass,
   classrooms,
@@ -29,8 +25,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenSettings,
   onOpenLineModal,
 }) => {
-  const brandTitle = mascot === 'pig' ? 'คุณหมูทวง V.2' : 'คุณไก่ทวง V.2';
-  const brandEmoji = mascot === 'pig' ? '🐷' : '🐔';
+  const brandTitle = 'คุณหมูทวง V.2';
+  const brandEmoji = '🐷';
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-sm transition-all">
@@ -38,8 +34,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         
         {/* Brand */}
         <div className="flex items-center gap-3">
-          <div className="relative group cursor-pointer" onClick={() => setMascot(mascot === 'pig' ? 'chicken' : 'pig')} title="คลิกเพื่อสลับมาสคอต หมู / ไก่">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-pink-400 via-rose-500 to-amber-500 flex items-center justify-center text-2xl shadow-md group-hover:scale-105 transition-transform">
+          <div className="relative group">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-pink-400 via-rose-500 to-amber-500 flex items-center justify-center text-2xl shadow-md transition-transform">
               {brandEmoji}
             </div>
             <span className="absolute -bottom-1 -right-1 bg-amber-400 text-[10px] font-bold px-1.5 py-0.5 rounded-full shadow border border-white">
@@ -92,19 +88,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <span className="hidden sm:inline">จัดการห้อง/นร.</span>
                 </button>
               </div>
-
-              {/* Mascot Switcher Toggle */}
-              <button
-                onClick={() => setMascot(mascot === 'pig' ? 'chicken' : 'pig')}
-                className={`hidden lg:flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-xl border transition-all ${
-                  mascot === 'pig'
-                    ? 'bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100'
-                    : 'bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100'
-                }`}
-                title="คลิกสลับมาสคอต"
-              >
-                <span>{mascot === 'pig' ? '🐷 ธีมคุณหมู' : '🐔 ธีมคุณไก่'}</span>
-              </button>
             </>
           )}
 
