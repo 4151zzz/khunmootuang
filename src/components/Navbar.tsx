@@ -66,42 +66,47 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Controls and Switchers */}
         <div className="flex items-center gap-2 sm:gap-3">
           
-          {/* Classroom Selector + Manage Button */}
-          <div className="flex items-center bg-slate-100/90 rounded-xl p-1 border border-slate-200">
-            <BookOpen className="w-3.5 h-3.5 text-slate-500 ml-2" />
-            <select
-              value={selectedClass}
-              onChange={(e) => setSelectedClass(e.target.value)}
-              className="bg-transparent text-xs font-semibold text-slate-700 border-none outline-none pr-2 py-1 cursor-pointer"
-            >
-              {classrooms.map((c) => (
-                <option key={c.id} value={c.name}>
-                  ห้อง {c.name}
-                </option>
-              ))}
-            </select>
-            <button
-              onClick={onOpenManageClass}
-              className="p-1 px-2 bg-white hover:bg-slate-200/70 text-slate-700 rounded-lg text-[11px] font-bold shadow-xs border border-slate-200 transition-colors flex items-center gap-1"
-              title="เพิ่ม ลบ แก้ไขห้องเรียนและรายชื่อนักเรียน"
-            >
-              <Users className="w-3 h-3 text-rose-500" />
-              <span className="hidden sm:inline">จัดการห้อง/นร.</span>
-            </button>
-          </div>
+          {/* Teacher Only Controls */}
+          {role === 'teacher' && (
+            <>
+              {/* Classroom Selector + Manage Button */}
+              <div className="flex items-center bg-slate-100/90 rounded-xl p-1 border border-slate-200">
+                <BookOpen className="w-3.5 h-3.5 text-slate-500 ml-2" />
+                <select
+                  value={selectedClass}
+                  onChange={(e) => setSelectedClass(e.target.value)}
+                  className="bg-transparent text-xs font-semibold text-slate-700 border-none outline-none pr-2 py-1 cursor-pointer"
+                >
+                  {classrooms.map((c) => (
+                    <option key={c.id} value={c.name}>
+                      ห้อง {c.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  onClick={onOpenManageClass}
+                  className="p-1 px-2 bg-white hover:bg-slate-200/70 text-slate-700 rounded-lg text-[11px] font-bold shadow-xs border border-slate-200 transition-colors flex items-center gap-1"
+                  title="เพิ่ม ลบ แก้ไขห้องเรียนและรายชื่อนักเรียน"
+                >
+                  <Users className="w-3 h-3 text-rose-500" />
+                  <span className="hidden sm:inline">จัดการห้อง/นร.</span>
+                </button>
+              </div>
 
-          {/* Mascot Switcher Toggle */}
-          <button
-            onClick={() => setMascot(mascot === 'pig' ? 'chicken' : 'pig')}
-            className={`hidden lg:flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-xl border transition-all ${
-              mascot === 'pig'
-                ? 'bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100'
-                : 'bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100'
-            }`}
-            title="คลิกสลับมาสคอต"
-          >
-            <span>{mascot === 'pig' ? '🐷 ธีมคุณหมู' : '🐔 ธีมคุณไก่'}</span>
-          </button>
+              {/* Mascot Switcher Toggle */}
+              <button
+                onClick={() => setMascot(mascot === 'pig' ? 'chicken' : 'pig')}
+                className={`hidden lg:flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-xl border transition-all ${
+                  mascot === 'pig'
+                    ? 'bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-100'
+                    : 'bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100'
+                }`}
+                title="คลิกสลับมาสคอต"
+              >
+                <span>{mascot === 'pig' ? '🐷 ธีมคุณหมู' : '🐔 ธีมคุณไก่'}</span>
+              </button>
+            </>
+          )}
 
           {/* Role Mode Switcher (Teacher Dashboard vs Student LIFF View) */}
           <div className="bg-slate-100 p-1 rounded-xl flex items-center border border-slate-200">
@@ -129,32 +134,37 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           </div>
 
-          {/* LINE Guide / How Students Enter Button */}
-          <button
-            onClick={onOpenLineGuide}
-            className="hidden md:flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 px-3 py-1.5 rounded-xl text-xs font-bold transition-all"
-            title="ดูวิธีเชื่อมต่อ LINE OA และวิธีที่นักเรียนเข้าใช้งาน"
-          >
-            <span>📲 วิธีเชื่อม LINE/นร.เข้ายังไง</span>
-          </button>
+          {/* Teacher Extra Actions */}
+          {role === 'teacher' && (
+            <>
+              {/* LINE Guide / How Students Enter Button */}
+              <button
+                onClick={onOpenLineGuide}
+                className="hidden md:flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 px-3 py-1.5 rounded-xl text-xs font-bold transition-all"
+                title="ดูวิธีเชื่อมต่อ LINE OA และวิธีที่นักเรียนเข้าใช้งาน"
+              >
+                <span>📲 วิธีเชื่อม LINE/นร.เข้ายังไง</span>
+              </button>
 
-          {/* LINE Simulator Button */}
-          <button
-            onClick={onOpenLineModal}
-            className="flex items-center gap-1.5 bg-[#06C755] hover:bg-[#05B34C] text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm transition-all active:scale-95"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-amber-200" />
-            <span className="hidden sm:inline">LINE OA Simulator</span>
-          </button>
+              {/* LINE Simulator Button */}
+              <button
+                onClick={onOpenLineModal}
+                className="flex items-center gap-1.5 bg-[#06C755] hover:bg-[#05B34C] text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow-sm transition-all active:scale-95"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-200" />
+                <span className="hidden sm:inline">LINE OA Simulator</span>
+              </button>
 
-          {/* Settings */}
-          <button
-            onClick={onOpenSettings}
-            className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors border border-transparent hover:border-slate-200"
-            title="ตั้งค่า API & ระบบ"
-          >
-            <Settings className="w-4 h-4" />
-          </button>
+              {/* Settings */}
+              <button
+                onClick={onOpenSettings}
+                className="p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors border border-transparent hover:border-slate-200"
+                title="ตั้งค่า API & ระบบ"
+              >
+                <Settings className="w-4 h-4" />
+              </button>
+            </>
+          )}
         </div>
 
       </div>

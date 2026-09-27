@@ -26,6 +26,8 @@ import { GamificationTab } from './components/tabs/GamificationTab';
 import { GalleryTab } from './components/tabs/GalleryTab';
 import { RandomizerTab } from './components/tabs/RandomizerTab';
 import { StudentPortal } from './components/StudentPortal';
+import { StudentOnboarding } from './components/student/StudentOnboarding';
+import { liffService, LineUserProfile } from './services/liffService';
 
 // Modals
 import { AiGradingModal } from './components/modals/AiGradingModal';
@@ -87,6 +89,32 @@ export function App() {
 
   // Active student for Student Portal view
   const [activeStudentId, setActiveStudentId] = useState<string>(students[0]?.id || 'std-1');
+  const [lineProfile, setLineProfile] = useState<LineUserProfile | null>(null);
+  const [boundStudentId, setBoundStudentId] = useState<string | null>(() => {
+    return typeof window !== 'undefined' ? localStorage.getItem('khunmoo_bound_student_id') : null;
+  });
+  const [isSwitchingStudent, setIsSwitchingStudent] = useState(false);
+
+  // Initialize LINE LIFF SDK & automatically retrieve real LINE profile
+  useEffect(() => {
+    const initLiff = async () => {
+      try {
+        const profile = await liffService.init(settings.liffId);
+        if (profile) {
+          setLineProfile(profile);
+          // Check if this LINE userId is already registered in the class list
+          const matched = students.find((s) => s.lineUserId === profile.userId);
+          if (matched) {
+            setBoundStudentId(matched.id);
+            localStorage.setItem('khunmoo_bound_student_id', matched.id);
+          }
+        }
+      } catch (err) {
+        console.warn('LIFF init error:', err);
+      }
+    };
+    initLiff();
+  }, [settings.liffId]);
 
   // Modals state
   const [aiModalData, setAiModalData] = useState<{
@@ -291,7 +319,10 @@ export function App() {
     return !sub || sub.status === 'pending';
   }).length;
 
-  const currentStudent = students.find((s) => s.id === activeStudentId) || students[0];
+  const currentStudent =
+    students.find((s) => s.id === boundStudentId) ||
+    students.find((s) => s.id === activeStudentId) ||
+    students[0];
 
   const teacherTabs = [
     { id: 'assignments', label: 'การบ้าน & ตรวจงาน (6 ขั้น)', icon: FileText },
@@ -452,35 +483,39 @@ export function App() {
 
         {/* Role Mode 2: Student LIFF Portal */}
         {role === 'student' && (
-          <div className="space-y-4">
-            
-            {/* Student Picker Selector for Demo Simulator */}
-            <div className="max-w-md mx-auto bg-white p-3 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between text-xs">
-              <span className="font-bold text-slate-600">จำลองสลับดูมุมมองนักเรียน:</span>
-              <select
-                value={activeStudentId}
-                onChange={(e) => setActiveStudentId(e.target.value)}
-                className="font-bold bg-slate-100 border border-slate-300 rounded-xl px-2.5 py-1 outline-none text-slate-800"
-              >
-                {students.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    เลขที่ {s.studentNumber} {s.name} ({s.nickname})
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Mobile LIFF Student Component */}
-            <StudentPortal
-              currentStudent={currentStudent}
-              assignments={assignments}
-              submissions={submissions}
-              onOpenCanvas={(sub, std, asg) => setCanvasModalData({ submission: sub, student: std, assignment: asg })}
-              onOpenHatchModal={(std) => setHatchModalStudent(std)}
-              onUploadHomework={handleUploadHomework}
-              mascot={mascot}
-            />
-
+          <div>
+            {!boundStudentId || isSwitchingStudent ? (
+              <StudentOnboarding
+                classrooms={classrooms}
+                students={students}
+                mascot={mascot}
+                lineProfile={lineProfile}
+                onComplete={(studentId, updatedStudents) => {
+                  if (updatedStudents) {
+                    setStudents(updatedStudents);
+                    storageService.saveStudents(updatedStudents);
+                  }
+                  setBoundStudentId(studentId);
+                  localStorage.setItem('khunmoo_bound_student_id', studentId);
+                  setIsSwitchingStudent(false);
+                }}
+                onSwitchToTeacher={() => setRole('teacher')}
+              />
+            ) : (
+              <div className="space-y-4">
+                <StudentPortal
+                  currentStudent={currentStudent}
+                  assignments={assignments}
+                  submissions={submissions}
+                  onOpenCanvas={(sub, std, asg) => setCanvasModalData({ submission: sub, student: std, assignment: asg })}
+                  onOpenHatchModal={(std) => setHatchModalStudent(std)}
+                  onUploadHomework={handleUploadHomework}
+                  mascot={mascot}
+                  lineProfile={lineProfile}
+                  onRebind={() => setIsSwitchingStudent(true)}
+                />
+              </div>
+            )}
           </div>
         )}
 

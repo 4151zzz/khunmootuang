@@ -13,6 +13,8 @@ import {
   Check
 } from 'lucide-react';
 import { sound } from '../services/soundService';
+import { LineUserProfile } from '../services/liffService';
+import { RefreshCw } from 'lucide-react';
 
 interface StudentPortalProps {
   currentStudent: Student;
@@ -22,6 +24,8 @@ interface StudentPortalProps {
   onOpenHatchModal: (student: Student) => void;
   onUploadHomework: (assignmentId: string, studentId: string, sampleImageUrl?: string) => void;
   mascot: MascotType;
+  lineProfile?: LineUserProfile | null;
+  onRebind?: () => void;
 }
 
 export const StudentPortal: React.FC<StudentPortalProps> = ({
@@ -32,6 +36,8 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
   onOpenHatchModal,
   onUploadHomework,
   mascot,
+  lineProfile,
+  onRebind,
 }) => {
   const [activeTab, setActiveTab] = useState<'assignments' | 'pets' | 'profile'>('assignments');
   const [selectedAsgForUpload, setSelectedAsgForUpload] = useState<string | null>(null);
@@ -58,17 +64,47 @@ export const StudentPortal: React.FC<StudentPortalProps> = ({
       {/* LINE LIFF Header Bar */}
       <div className="bg-[#24303c] text-white px-4 py-3 flex items-center justify-between shadow">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-rose-500 flex items-center justify-center text-lg shadow-sm">
-            {mascotEmoji}
-          </div>
+          {lineProfile?.pictureUrl ? (
+            <img
+              src={lineProfile.pictureUrl}
+              alt="LINE"
+              className="w-8 h-8 rounded-full border border-emerald-400 object-cover"
+            />
+          ) : (
+            <div className="w-8 h-8 rounded-full bg-rose-500 flex items-center justify-center text-lg shadow-sm">
+              {mascotEmoji}
+            </div>
+          )}
           <div>
-            <div className="font-bold text-xs">{mascotName} LIFF App</div>
-            <div className="text-[10px] text-emerald-400">ผูกกับ LINE ID: @{currentStudent.nickname}</div>
+            <div className="font-bold text-xs flex items-center gap-1">
+              <span>{mascotName} LIFF</span>
+              {lineProfile?.displayName && (
+                <span className="text-[10px] text-emerald-400 font-normal">
+                  ({lineProfile.displayName})
+                </span>
+              )}
+            </div>
+            <div className="text-[10px] text-slate-300">
+              ห้อง {currentStudent.classroom} • เลขที่ {currentStudent.studentNumber}
+            </div>
           </div>
         </div>
-        <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded-full font-mono text-slate-300">
-          ห้อง {currentStudent.classroom}
-        </span>
+
+        <div className="flex items-center gap-2">
+          {onRebind && (
+            <button
+              onClick={onRebind}
+              className="text-[10px] bg-white/10 hover:bg-white/20 text-slate-200 px-2 py-1 rounded-lg flex items-center gap-1 transition-all"
+              title="เปลี่ยนห้องหรือเลือกชื่อใหม่"
+            >
+              <RefreshCw className="w-2.5 h-2.5 text-amber-300" />
+              <span>สลับห้อง/ชื่อ</span>
+            </button>
+          )}
+          <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full font-bold border border-emerald-500/30">
+            ห้อง {currentStudent.classroom}
+          </span>
+        </div>
       </div>
 
       {/* Student Profile & Gamification Card */}
