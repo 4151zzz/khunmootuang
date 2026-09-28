@@ -14,6 +14,7 @@ import {
   Shuffle
 } from 'lucide-react';
 import { sound } from '../../services/soundService';
+import { alertService } from '../../services/alertService';
 
 interface ManageClassModalProps {
   isOpen: boolean;
@@ -70,6 +71,11 @@ export const ManageClassModal: React.FC<ManageClassModalProps> = ({
     e.preventDefault();
     if (!newClassName.trim()) return;
 
+    if (classrooms.some((c) => c.name.toLowerCase() === newClassName.trim().toLowerCase())) {
+      alertService.showWarning('มีห้องนี้อยู่แล้ว', `ห้อง ${newClassName.trim()} มีอยู่ในระบบแล้วครับ`);
+      return;
+    }
+
     sound.playCoin();
     const newClass: Classroom = {
       id: `cls-${Date.now()}`,
@@ -86,6 +92,30 @@ export const ManageClassModal: React.FC<ManageClassModalProps> = ({
     setShowAddClass(false);
     setCurrentFilterClass(newClass.name);
     onSelectClass(newClass.name);
+    alertService.showSuccess('เพิ่มห้องเรียนสำเร็จ! ✨', `ห้อง ${newClass.name} ถูกเพิ่มเข้าสู่ระบบแล้ว`);
+  };
+
+  const handleQuickPromptAddClass = async () => {
+    const result = await alertService.promptAddClassroom();
+    if (result) {
+      if (classrooms.some((c) => c.name.toLowerCase() === result.name.toLowerCase())) {
+        alertService.showWarning('มีห้องนี้อยู่แล้ว', `ห้อง ${result.name} มีอยู่ในระบบแล้วครับ`);
+        return;
+      }
+      sound.playCoin();
+      const newClass: Classroom = {
+        id: `cls-${Date.now()}`,
+        name: result.name,
+        description: result.description,
+        gradeLevel: result.name.includes('/') ? result.name.split('/')[0] : 'ม.ปลาย',
+        academicYear: '2569'
+      };
+      const updated = [...classrooms, newClass];
+      onSaveClassrooms(updated);
+      setCurrentFilterClass(newClass.name);
+      onSelectClass(newClass.name);
+      alertService.showSuccess('เพิ่มห้องเรียนสำเร็จ! ✨', `ห้อง ${newClass.name} ถูกเพิ่มเข้าสู่ระบบแล้ว`);
+    }
   };
 
   const handleEditClassroom = (cls: Classroom) => {
@@ -116,22 +146,25 @@ export const ManageClassModal: React.FC<ManageClassModalProps> = ({
     }
 
     setEditingClassId(null);
+    alertService.showSuccess('แก้ไขชื่อห้องเรียบร้อย');
   };
 
-  const handleDeleteClassroom = (classId: string, className: string) => {
+  const handleDeleteClassroom = async (classId: string, className: string) => {
     if (classrooms.length <= 1) {
-      alert('ต้องมีห้องเรียนอย่างน้อย 1 ห้อง');
+      alertService.showWarning('ไม่สามารถลบได้', 'ต้องมีห้องเรียนอย่างน้อย 1 ห้องในระบบครับ');
       return;
     }
 
     const count = students.filter((s) => s.classroom === className).length;
-    if (
-      confirm(
-        `คุณต้องการลบห้อง "${className}" หรือไม่? ${
-          count > 0 ? `(มีนักเรียนในห้องนี้ ${count} คน)` : ''
-        }`
-      )
-    ) {
+    const confirmed = await alertService.confirmDelete({
+      title: `ลบห้อง "${className}"?`,
+      text: count > 0
+        ? `ห้องนี้มีนักเรียน ${count} คน หากลบห้อง ข้อมูลนักเรียนในห้องนี้จะถูกลบไปด้วย!`
+        : `คุณต้องการลบห้อง "${className}" ออกจากระบบหรือไม่?`,
+      confirmText: 'ใช่, ลบห้องนี้เลย!'
+    });
+
+    if (confirmed) {
       sound.playWarning();
       const updatedClasses = classrooms.filter((c) => c.id !== classId);
       onSaveClassrooms(updatedClasses);
@@ -143,6 +176,7 @@ export const ManageClassModal: React.FC<ManageClassModalProps> = ({
       const nextClass = updatedClasses[0]?.name || 'ม.4/1';
       setCurrentFilterClass(nextClass);
       onSelectClass(nextClass);
+      alertService.showSuccess('ลบห้องเรียนเรียบร้อย');
     }
   };
 
@@ -215,11 +249,18 @@ export const ManageClassModal: React.FC<ManageClassModalProps> = ({
     setEditingStudentId(null);
   };
 
-  const handleDeleteStudent = (studentId: string, studentName: string) => {
-    if (confirm(`คุณต้องการลบนักเรียน "${studentName}" หรือไม่?`)) {
+  const handleDeleteStudent = async (studentId: string, studentName: string) => {
+    const confirmed = await alertService.confirmDelete({
+      title: 'ยืนยันการลบนักเรียน?',
+      text: `คุณต้องการลบ "${studentName}" ออกจากห้องเรียนหรือไม่?`,
+      confirmText: 'ใช่, ลบเลย'
+    });
+
+    if (confirmed) {
       sound.playWarning();
       const updated = students.filter((s) => s.id !== studentId);
       onSaveStudents(updated);
+      alertService.showSuccess('ลบนักเรียนเรียบร้อย');
     }
   };
 
@@ -338,7 +379,7 @@ export const ManageClassModal: React.FC<ManageClassModalProps> = ({
               
               {/* Top Controls: Filter by Class + Action buttons */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <label className="font-bold text-slate-700">เลือกดูห้องเรียน:</label>
                   <select
                     value={currentFilterClass}
@@ -354,6 +395,14 @@ export const ManageClassModal: React.FC<ManageClassModalProps> = ({
                       </option>
                     ))}
                   </select>
+                  <button
+                    onClick={handleQuickPromptAddClass}
+                    className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold rounded-xl border border-emerald-200 flex items-center gap-1 transition-colors"
+                    title="เพิ่มห้องเรียนใหม่ทันที"
+                  >
+                    <Plus className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>เพิ่มห้องใหม่</span>
+                  </button>
                   <span className="text-slate-400">({currentClassStudents.length} คน)</span>
                 </div>
 

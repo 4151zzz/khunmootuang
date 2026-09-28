@@ -1,6 +1,8 @@
 import React from 'react';
 import { UserRole, MascotType, Classroom } from '../types';
-import { Sparkles, Settings, Smartphone, Monitor, BookOpen, Users } from 'lucide-react';
+import { Sparkles, Settings, Smartphone, Monitor, BookOpen, Users, Plus } from 'lucide-react';
+import { alertService } from '../services/alertService';
+import { sound } from '../services/soundService';
 
 interface NavbarProps {
   role: UserRole;
@@ -12,6 +14,7 @@ interface NavbarProps {
   onOpenLineGuide: () => void;
   onOpenSettings: () => void;
   onOpenLineModal: () => void;
+  onAddClassroom?: (newClass: Classroom) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -24,9 +27,33 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenLineGuide,
   onOpenSettings,
   onOpenLineModal,
+  onAddClassroom,
 }) => {
   const brandTitle = 'คุณหมูทวง V.2';
   const brandEmoji = '🐷';
+
+  const handleQuickAddClass = async () => {
+    const res = await alertService.promptAddClassroom();
+    if (res) {
+      if (classrooms.some((c) => c.name.toLowerCase() === res.name.toLowerCase())) {
+        alertService.showWarning('มีห้องนี้อยู่แล้ว', `ห้อง ${res.name} มีอยู่ในระบบแล้วครับ`);
+        return;
+      }
+      sound.playCoin();
+      const newClass: Classroom = {
+        id: `cls-${Date.now()}`,
+        name: res.name,
+        description: res.description,
+        gradeLevel: res.name.includes('/') ? res.name.split('/')[0] : 'ม.ปลาย',
+        academicYear: '2569'
+      };
+      if (onAddClassroom) {
+        onAddClassroom(newClass);
+      }
+      setSelectedClass(newClass.name);
+      alertService.showSuccess('เพิ่มห้องเรียนสำเร็จ! ✨', `ห้อง ${newClass.name} ถูกเพิ่มเข้าสู่ระบบแล้ว`);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-sm transition-all">
@@ -51,6 +78,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full border border-emerald-200">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 LINE OA Ready
+              </span>
+              <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold bg-sky-100 text-sky-700 px-2 py-0.5 rounded-full border border-sky-200" title="ฐานข้อมูล Firebase Firestore ซิงค์สดแบบ Realtime">
+                <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-ping"></span>
+                Cloud Sync
               </span>
             </div>
             <p className="text-xs text-slate-500 hidden md:block">
@@ -86,6 +117,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   <Users className="w-3 h-3 text-rose-500" />
                   <span className="hidden sm:inline">จัดการห้อง/นร.</span>
+                </button>
+                <button
+                  onClick={handleQuickAddClass}
+                  className="p-1 px-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-[11px] font-bold shadow-xs transition-colors flex items-center gap-1 active:scale-95"
+                  title="เพิ่มห้องเรียนใหม่ด่วน"
+                >
+                  <Plus className="w-3 h-3" />
+                  <span className="hidden sm:inline">เพิ่มห้อง</span>
                 </button>
               </div>
             </>

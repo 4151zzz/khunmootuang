@@ -3,6 +3,7 @@ import { X, Save, Key, RotateCcw, ShieldCheck, Check } from 'lucide-react';
 import { LineSettings } from '../../types';
 import { storageService } from '../../services/storageService';
 import { sound } from '../../services/soundService';
+import { alertService } from '../../services/alertService';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -32,8 +33,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     }, 900);
   };
 
-  const handleReset = () => {
-    if (confirm('คุณต้องการรีเซ็ตข้อมูลตัวอย่างทั้งหมดกลับเป็นค่าเริ่มต้นหรือไม่?')) {
+  const handleReset = async () => {
+    const confirmed = await alertService.confirmDelete({
+      title: 'รีเซ็ตข้อมูลทั้งหมด?',
+      text: 'ระบบจะล้างข้อมูลที่บันทึกไว้ในเครื่องทั้งหมด และโหลดค่าเริ่มต้นใหม่',
+      confirmText: 'ใช่, รีเซ็ตเลย'
+    });
+    if (confirmed) {
       storageService.resetAll();
     }
   };

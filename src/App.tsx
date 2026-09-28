@@ -139,6 +139,25 @@ export function App() {
     );
   };
 
+  // Real-time synchronization with Firebase Cloud Firestore
+  useEffect(() => {
+    const unsubscribe = storageService.initRealtimeSync({
+      onClassroomsChange: (data) => setClassrooms(data),
+      onStudentsChange: (data) => setStudents(data),
+      onAssignmentsChange: (data) => setAssignments(data),
+      onSubmissionsChange: (data) => setSubmissions(data),
+      onAttendanceChange: (data) => setAttendance(data),
+      onExamChange: (data) => setExam(data),
+      onWordCloudChange: (data) => setWordCloud(data),
+      onPollChange: (data) => setPoll(data),
+      onSettingsChange: (data) => setSettings(data),
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
   useEffect(() => {
     storageService.saveClassrooms(classrooms);
   }, [classrooms]);
@@ -350,6 +369,7 @@ export function App() {
           onOpenLineGuide={() => setShowLineGuideModal(true)}
           onOpenSettings={() => setShowSettingsModal(true)}
           onOpenLineModal={() => setShowLineModal(true)}
+          onAddClassroom={(newClass) => setClassrooms((prev) => [...prev, newClass])}
         />
       )}
 
@@ -490,10 +510,15 @@ export function App() {
                 students={students}
                 mascot={mascot}
                 lineProfile={lineProfile}
-                onComplete={(studentId, updatedStudents) => {
+                onComplete={async (studentId, updatedStudents) => {
                   if (updatedStudents) {
                     setStudents(updatedStudents);
-                    storageService.saveStudents(updatedStudents);
+                    const newStd = updatedStudents.find((s) => s.id === studentId);
+                    if (newStd) {
+                      await storageService.addOrUpdateStudent(newStd);
+                    } else {
+                      storageService.saveStudents(updatedStudents);
+                    }
                   }
                   setBoundStudentId(studentId);
                   localStorage.setItem('khunmoo_bound_student_id', studentId);

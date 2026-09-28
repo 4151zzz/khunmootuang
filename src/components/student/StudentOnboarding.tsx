@@ -3,6 +3,7 @@ import { Classroom, Student, MascotType } from '../../types';
 import { LineUserProfile } from '../../services/liffService';
 import { UserCheck, Sparkles, PlusCircle, Check, ArrowRight, ShieldCheck } from 'lucide-react';
 import { sound } from '../../services/soundService';
+import { alertService } from '../../services/alertService';
 import confetti from 'canvas-confetti';
 
 interface StudentOnboardingProps {
@@ -29,6 +30,13 @@ export const StudentOnboarding: React.FC<StudentOnboardingProps> = ({
   const [newNickname, setNewNickname] = useState('');
   const [newStudentNumber, setNewStudentNumber] = useState<number>(1);
 
+  // Sync selectedClass if classrooms list changes
+  React.useEffect(() => {
+    if (classrooms.length > 0 && !classrooms.some((c) => c.name === selectedClass)) {
+      setSelectedClass(classrooms[0].name);
+    }
+  }, [classrooms, selectedClass]);
+
   const mascotEmoji = '🐷';
   const mascotName = 'คุณหมูทวง';
 
@@ -45,7 +53,7 @@ export const StudentOnboarding: React.FC<StudentOnboardingProps> = ({
 
     if (isRegisteringNew) {
       if (!newName.trim()) {
-        alert('กรุณากรอกชื่อ-นามสกุล');
+        alertService.showWarning('กรุณากรอกข้อมูล', 'กรุณากรอกชื่อ-นามสกุลของนักเรียนครับ');
         return;
       }
       const newStd: Student = {
